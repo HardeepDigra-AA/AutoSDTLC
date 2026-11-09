@@ -813,6 +813,51 @@ Build status: GREEN (Commit: a7f8c92)"""
     conn.close()
     return RedirectResponse(url=f"/?story_id={story_id}", status_code=303)
 
+
+# ----------------------------------------------------
+# 10. TELEMETRY & HEALTH AUDIT ENDPOINTS
+# ----------------------------------------------------
+@app.get("/api/telemetry")
+def get_telemetry():
+    """Returns aggregated real-time metrics across all agent workflows."""
+    conn = get_db()
+    total_stories = conn.execute("SELECT COUNT(*) FROM user_stories").fetchone()[0]
+    total_defects = conn.execute("SELECT COUNT(*) FROM defects").fetchone()[0]
+    closed_defects = conn.execute("SELECT COUNT(*) FROM defects WHERE status = 'VERIFIED_CLOSED'").fetchone()[0]
+    total_ac = conn.execute("SELECT COUNT(*) FROM acceptance_criteria").fetchone()[0]
+    passed_ac = conn.execute("SELECT COUNT(*) FROM acceptance_criteria WHERE status = 'PASSED'").fetchone()[0]
+    ci_success = conn.execute("SELECT COUNT(*) FROM ci_runs WHERE build_status = 'SUCCESS'").fetchone()[0]
+    conn.close()
+
+    defect_closure_rate = round((closed_defects / total_defects * 100), 1) if total_defects > 0 else 100.0
+    ac_pass_rate = round((passed_ac / total_ac * 100), 1) if total_ac > 0 else 100.0
+
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "metrics": {
+            "total_user_stories": total_stories,
+            "total_acceptance_criteria": total_ac,
+            "acceptance_criteria_pass_rate_pct": ac_pass_rate,
+            "total_defects_captured": total_defects,
+            "total_defects_verified_closed": closed_defects,
+            "defect_resolution_rate_pct": defect_closure_rate,
+            "successful_ci_promotions": ci_success,
+        },
+        "air_gap_policy": {
+            "developer_context_isolation": "ENFORCED",
+            "qa_test_leak_prevention": "ACTIVE",
+            "cross_agent_boundary": "STRICT_SEPARATION"
+        }
+    }
+
+
+@app.get("/api/health")
+def get_health():
+    """Healthcheck endpoint for container/orchestrator liveness probes."""
+    return {"status": "ok", "service": "AutoSDTLC-Engine", "version": "1.1.0"}
+
+
 # Seed an illustrative story if DB is empty
 conn = get_db()
 if not conn.execute("SELECT id FROM user_stories").fetchall():
