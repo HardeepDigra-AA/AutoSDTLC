@@ -58,9 +58,10 @@ def test_repository_contains_no_non_python_implementation_scripts() -> None:
 def test_executable_project_directories_contain_python_files_only() -> None:
     code_directories = ("src", "tests", "examples", "scripts")
     non_python: list[str] = []
+    ignored_parts = {"__pycache__", ".egg-info"}
     for directory in code_directories:
         for path in (ROOT / directory).rglob("*"):
-            if not path.is_file() or "__pycache__" in path.parts:
+            if not path.is_file() or any(part in ignored_parts or part.endswith(".egg-info") for part in path.parts):
                 continue
             if path.suffix.lower() != ".py":
                 non_python.append(str(path.relative_to(ROOT)))
