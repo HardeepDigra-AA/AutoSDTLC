@@ -6,8 +6,8 @@ import argparse
 import os
 import sqlite3
 import sys
-from uuid import uuid4
 from pathlib import Path
+from uuid import uuid4
 
 from ai_sdlc import __version__
 from ai_sdlc.domain.architecture import ArchitectureError
@@ -27,13 +27,13 @@ from ai_sdlc.integrations.github import (
     GitHubIntegrationError,
     GitWorktreeManager,
 )
+from ai_sdlc.services.architecture_service import ArchitectureService
 from ai_sdlc.services.identity_service import (
-    AuthenticationError,
     AuthenticatedWorkflowGateway,
+    AuthenticationError,
     AuthorizationError,
     IdentityService,
 )
-from ai_sdlc.services.architecture_service import ArchitectureService
 from ai_sdlc.services.requirements_service import RequirementsService
 from ai_sdlc.services.workflow_service import WorkflowService
 

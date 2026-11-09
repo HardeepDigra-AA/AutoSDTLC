@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import Any
 
 from ai_sdlc.domain.architecture import (
+    REQUIRED_ARTIFACT_TYPES,
     ArchitectureArtifactType,
     ArchitectureReviewOutcome,
     ArchitectureValidationError,
-    REQUIRED_ARTIFACT_TYPES,
     require_architect_role,
     require_reviewer_role,
     require_text,

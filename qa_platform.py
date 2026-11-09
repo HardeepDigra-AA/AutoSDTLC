@@ -15,9 +15,8 @@ Strict Air-Gap between Developer and QA Agents:
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 DATA_DIR = Path("data")
@@ -228,7 +227,7 @@ THEME_CSS = """
 # 1. MAIN PORTAL VIEW
 # ----------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-def index(story_id: Optional[str] = None):
+def index(story_id: str | None = None):
     conn = get_db()
     stories = conn.execute("SELECT * FROM user_stories ORDER BY created_at DESC").fetchall()
     
@@ -437,7 +436,7 @@ def index(story_id: Optional[str] = None):
             </div>
             """
         elif current_phase == "MERGED_TO_MAIN":
-            action_panel = f"""
+            action_panel = """
             <div style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); border-radius:10px; padding:18px; text-align:center;">
                 <h3 style="color:#34d399; margin-bottom:6px;">🎉 Story Successfully Merged to Main</h3>
                 <p style="font-size:13px; color:#cbd5e1;">All Acceptance Criteria automated, air-gapped defects fixed, RTM 100% verified, and CI pipeline green.</p>

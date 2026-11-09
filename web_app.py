@@ -6,15 +6,14 @@ Combines:
 All backed dynamically by SQLite without hardcoded data.
 """
 import hashlib
-import os
 import sqlite3
 from pathlib import Path
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException, Form, Request, Response
+
+from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
+from ai_sdlc.domain.workflow import Action, FeatureRequest, Role
 from ai_sdlc.infrastructure.sqlite_repository import SQLiteRepository
-from ai_sdlc.domain.workflow import Action, Role, FeatureRequest, WorkflowState
 from ai_sdlc.services.workflow_service import WorkflowService
 
 # Databases
@@ -84,7 +83,7 @@ def get_user_activity(user_id: int, limit: int = 8):
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
-def get_current_user(request: Request) -> Optional[dict]:
+def get_current_user(request: Request) -> dict | None:
     email = request.cookies.get("session_user")
     if not email:
         return None
@@ -313,7 +312,7 @@ def index_page(request: Request):
 # 2. USER APPLICATION: SIGN-UP (/signup)
 # ==========================================
 @app.get("/signup", response_class=HTMLResponse)
-def signup_page(error: Optional[str] = None):
+def signup_page(error: str | None = None):
     error_html = f"<div class='alert-error'>{error}</div>" if error else ""
     return f"""
     <!DOCTYPE html>
@@ -404,7 +403,7 @@ def handle_signup(
 # 3. USER APPLICATION: LOGIN (/login)
 # ==========================================
 @app.get("/login", response_class=HTMLResponse)
-def login_page(error: Optional[str] = None):
+def login_page(error: str | None = None):
     error_html = f"<div class='alert-error'>{error}</div>" if error else ""
     return f"""
     <!DOCTYPE html>
@@ -481,7 +480,7 @@ def logout():
 # 4. USER APPLICATION: DASHBOARD (/app/dashboard)
 # ==========================================
 @app.get("/app/dashboard", response_class=HTMLResponse)
-def dashboard_page(request: Request, msg: Optional[str] = None, err: Optional[str] = None):
+def dashboard_page(request: Request, msg: str | None = None, err: str | None = None):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=303)
@@ -686,9 +685,9 @@ WORKFLOW_STAGES = [
 @app.get("/orchestrator", response_class=HTMLResponse)
 def orchestrator_dashboard():
     features = repo.list_features()
-    total_features = len(features)
-    in_intake = sum(1 for f in features if f.state.value.lower() == "intake")
-    in_review = sum(1 for f in features if "review" in f.state.value.lower())
+    len(features)
+    sum(1 for f in features if f.state.value.lower() == "intake")
+    sum(1 for f in features if "review" in f.state.value.lower())
 
     feature_cards = ""
     for f in features:

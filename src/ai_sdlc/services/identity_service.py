@@ -11,7 +11,7 @@ import hashlib
 import hmac
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Final
 
 from ai_sdlc.domain.workflow import Action, Role
@@ -135,7 +135,7 @@ class IdentityService:
             "sha256", secret.encode("utf-8"), salt, HASH_ITERATIONS
         )
         expiry = (
-            datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+            datetime.now(UTC) + timedelta(days=expires_in_days)
             if expires_in_days is not None
             else None
         )
@@ -189,7 +189,7 @@ class IdentityService:
             "sha256", secret.encode("utf-8"), salt, HASH_ITERATIONS
         )
         expiry = (
-            datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+            datetime.now(UTC) + timedelta(days=expires_in_days)
             if expires_in_days is not None
             else None
         )
@@ -214,7 +214,7 @@ class IdentityService:
             raise AuthenticationError("Identity is disabled.")
         if credential["expires_at"]:
             expiry = datetime.fromisoformat(str(credential["expires_at"]))
-            if expiry <= datetime.now(timezone.utc):
+            if expiry <= datetime.now(UTC):
                 raise AuthenticationError("Credential has expired.")
 
         candidate = hashlib.pbkdf2_hmac(

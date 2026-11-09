@@ -18,9 +18,6 @@ def virtualenv_python() -> Path:
 
 
 def main() -> int:
-    if sys.version_info < (3, 11):
-        print("Python 3.11 or newer is required.", file=sys.stderr)
-        return 2
 
     python = virtualenv_python()
     if not python.exists():
