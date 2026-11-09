@@ -1,0 +1,9 @@
+# Replace these examples with real GitHub team handles before enabling branch protection.
+# CODEOWNERS reviewers must be able to access the target repository.
+/src/ai_sdlc/domain/ @your-org/architecture-team
+/src/ai_sdlc/services/ @your-org/engineering-leads
+/src/ai_sdlc/integrations/ @your-org/platform-team
+/src/ai_sdlc/infrastructure/ @your-org/platform-team
+/tests/ @your-org/qa-leads
+/.github/ @your-org/repository-maintainers
+/migrations/ @your-org/architecture-team @your-org/platform-team
