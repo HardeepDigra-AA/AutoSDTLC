@@ -20,9 +20,8 @@ from ai_sdlc.integrations.github import (
     RepositoryRef,
 )
 from ai_sdlc.services.identity_service import (
-    AuthenticationError,
-    AuthorizationError,
     AuthenticatedWorkflowGateway,
+    AuthenticationError,
     AuthorizationError,
     IdentityService,
 )

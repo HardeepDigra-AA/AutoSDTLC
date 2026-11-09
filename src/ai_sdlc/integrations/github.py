@@ -13,7 +13,6 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
-from uuid import uuid4
 
 from ai_sdlc.services.identity_service import IdentityService, Principal
 

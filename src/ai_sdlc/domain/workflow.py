@@ -7,7 +7,7 @@ GitHub operations, and LLM agent execution will be added behind separate adapter
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Final
 
@@ -308,7 +308,7 @@ class WorkflowEngine:
             to_state=rule.to_state,
             note=note.strip(),
             evidence_uri=evidence_uri.strip() if evidence_uri else None,
-            occurred_at=datetime.now(timezone.utc),
+            occurred_at=datetime.now(UTC),
         )
 
         workflow._state = rule.to_state

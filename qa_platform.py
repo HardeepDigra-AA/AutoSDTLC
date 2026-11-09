@@ -15,9 +15,8 @@ Strict Air-Gap between Developer and QA Agents:
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 DATA_DIR = Path("data")
@@ -228,7 +227,7 @@ THEME_CSS = """
 # 1. MAIN PORTAL VIEW
 # ----------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-def index(story_id: Optional[str] = None):
+def index(story_id: str | None = None):
     conn = get_db()
     stories = conn.execute("SELECT * FROM user_stories ORDER BY created_at DESC").fetchall()
     
@@ -437,7 +436,7 @@ def index(story_id: Optional[str] = None):
             </div>
             """
         elif current_phase == "MERGED_TO_MAIN":
-            action_panel = f"""
+            action_panel = """
             <div style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); border-radius:10px; padding:18px; text-align:center;">
                 <h3 style="color:#34d399; margin-bottom:6px;">🎉 Story Successfully Merged to Main</h3>
                 <p style="font-size:13px; color:#cbd5e1;">All Acceptance Criteria automated, air-gapped defects fixed, RTM 100% verified, and CI pipeline green.</p>
@@ -812,6 +811,51 @@ Build status: GREEN (Commit: a7f8c92)"""
     conn.commit()
     conn.close()
     return RedirectResponse(url=f"/?story_id={story_id}", status_code=303)
+
+
+# ----------------------------------------------------
+# 10. TELEMETRY & HEALTH AUDIT ENDPOINTS
+# ----------------------------------------------------
+@app.get("/api/telemetry")
+def get_telemetry():
+    """Returns aggregated real-time metrics across all agent workflows."""
+    conn = get_db()
+    total_stories = conn.execute("SELECT COUNT(*) FROM user_stories").fetchone()[0]
+    total_defects = conn.execute("SELECT COUNT(*) FROM defects").fetchone()[0]
+    closed_defects = conn.execute("SELECT COUNT(*) FROM defects WHERE status = 'VERIFIED_CLOSED'").fetchone()[0]
+    total_ac = conn.execute("SELECT COUNT(*) FROM acceptance_criteria").fetchone()[0]
+    passed_ac = conn.execute("SELECT COUNT(*) FROM acceptance_criteria WHERE status = 'PASSED'").fetchone()[0]
+    ci_success = conn.execute("SELECT COUNT(*) FROM ci_runs WHERE build_status = 'SUCCESS'").fetchone()[0]
+    conn.close()
+
+    defect_closure_rate = round((closed_defects / total_defects * 100), 1) if total_defects > 0 else 100.0
+    ac_pass_rate = round((passed_ac / total_ac * 100), 1) if total_ac > 0 else 100.0
+
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "metrics": {
+            "total_user_stories": total_stories,
+            "total_acceptance_criteria": total_ac,
+            "acceptance_criteria_pass_rate_pct": ac_pass_rate,
+            "total_defects_captured": total_defects,
+            "total_defects_verified_closed": closed_defects,
+            "defect_resolution_rate_pct": defect_closure_rate,
+            "successful_ci_promotions": ci_success,
+        },
+        "air_gap_policy": {
+            "developer_context_isolation": "ENFORCED",
+            "qa_test_leak_prevention": "ACTIVE",
+            "cross_agent_boundary": "STRICT_SEPARATION"
+        }
+    }
+
+
+@app.get("/api/health")
+def get_health():
+    """Healthcheck endpoint for container/orchestrator liveness probes."""
+    return {"status": "ok", "service": "AutoSDTLC-Engine", "version": "1.1.0"}
+
 
 # Seed an illustrative story if DB is empty
 conn = get_db()

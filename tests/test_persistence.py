@@ -13,9 +13,9 @@ from ai_sdlc.domain.workflow import (
     WorkflowValidationError,
 )
 from ai_sdlc.infrastructure.sqlite_repository import SQLiteRepository
-from ai_sdlc.services.workflow_service import WorkflowService
-from ai_sdlc.services.requirements_service import RequirementsService
 from ai_sdlc.services.architecture_service import ArchitectureService
+from ai_sdlc.services.requirements_service import RequirementsService
+from ai_sdlc.services.workflow_service import WorkflowService
 
 
 @pytest.fixture
