@@ -1,0 +1,16 @@
+[
+  {
+    "sku": "SEED-ELEC-100",
+    "name": "Noise Cancelling Headphones X",
+    "category": "Audio",
+    "price": 299.99,
+    "stock_quantity": 40
+  },
+  {
+    "sku": "SEED-ELEC-200",
+    "name": "USB-C Dual 4K Docking Station",
+    "category": "Accessories",
+    "price": 189.50,
+    "stock_quantity": 25
+  }
+]
