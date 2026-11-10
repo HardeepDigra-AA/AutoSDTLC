@@ -4,11 +4,12 @@ Configures:
 - Automatic Web Server background orchestration.
 - Configuration loading (.env, CLI flags).
 - Database Seeder & Test Data cleanup.
-- POM fixtures (AuthPage, OrdersDashboardPage).
+- POM fixtures (AuthPage, CatalogPage, CheckoutPage, OrdersDashboardPage).
 """
 from __future__ import annotations
 
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -17,6 +18,8 @@ from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from testing.framework.config.settings import EnvironmentConfig, load_config
 from testing.framework.pages.auth_page import AuthPage
+from testing.framework.pages.catalog_page import CatalogPage
+from testing.framework.pages.checkout_page import CheckoutPage
 from testing.framework.pages.dashboard_page import OrdersDashboardPage
 from testing.test_data.factories.data_factory import DatabaseTestSeeder
 
@@ -29,14 +32,13 @@ def env_config() -> EnvironmentConfig:
 @pytest.fixture(scope="session")
 def db_seeder(env_config: EnvironmentConfig) -> DatabaseTestSeeder:
     seeder = DatabaseTestSeeder(env_config.db_path)
-    seeder.seed_baseline_catalog()
+    seeder.seed_complete_enterprise_baseline()
     return seeder
 
 
 @pytest.fixture(scope="session", autouse=True)
 def app_server(env_config: EnvironmentConfig):
     """Orchestrates the FastAPI server process on port 8002."""
-    import sys
     repo_root = Path(__file__).resolve().parent.parent
     python_exe = sys.executable
 
@@ -49,7 +51,7 @@ def app_server(env_config: EnvironmentConfig):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    time.sleep(2.0)  # Allow socket bind
+    time.sleep(2.0)
     yield server_process
     server_process.terminate()
     server_process.wait()
@@ -83,6 +85,16 @@ def page(context: BrowserContext) -> Page:
 @pytest.fixture(scope="function")
 def auth_page(page: Page, env_config: EnvironmentConfig) -> AuthPage:
     return AuthPage(page, env_config.base_url)
+
+
+@pytest.fixture(scope="function")
+def catalog_page(page: Page, env_config: EnvironmentConfig) -> CatalogPage:
+    return CatalogPage(page, env_config.base_url)
+
+
+@pytest.fixture(scope="function")
+def checkout_page(page: Page, env_config: EnvironmentConfig) -> CheckoutPage:
+    return CheckoutPage(page, env_config.base_url)
 
 
 @pytest.fixture(scope="function")
