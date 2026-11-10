@@ -414,15 +414,20 @@ def catalog_view(
     cards_html = ""
     for p in products:
         stock_badge = (
-            '<span class="badge badge-stock" data-testid="stock-badge">In Stock</span>'
+            f'<span class="badge badge-stock" data-testid="stock-badge">In Stock ({p["stock_quantity"]})</span>'
             if p["stock_quantity"] > 5
             else (
-                '<span class="badge badge-lowstock" data-testid="stock-badge">Low Stock</span>'
+                f'<span class="badge badge-lowstock" data-testid="stock-badge">Low Stock ({p["stock_quantity"]})</span>'
                 if p["stock_quantity"] > 0
-                else '<span class="badge badge-outstock" data-testid="stock-badge">Out of Stock</span>'
+                else '<span class="badge badge-outstock" data-testid="stock-badge">Out of Stock (0)</span>'
             )
         )
-        disabled_attr = "disabled" if p["stock_quantity"] <= 0 else ""
+        "disabled" if p["stock_quantity"] <= 0 else ""
+        button_html = (
+            f'<a href="/checkout?sku={p["sku"]}" class="btn" style="width:100%; justify-content:center; text-decoration:none;" data-testid="btn-buy-now">Buy Now →</a>'
+            if p["stock_quantity"] > 0
+            else '<button class="btn btn-secondary" style="width:100%; justify-content:center; opacity:0.5; cursor:not-allowed;" data-testid="btn-buy-now" disabled>Out of Stock</button>'
+        )
         cards_html += f"""
         <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;" data-testid="product-card" data-sku="{p['sku']}">
             <div>
@@ -431,13 +436,11 @@ def catalog_view(
                     {stock_badge}
                 </div>
                 <h4 style="font-size:16px; margin-bottom:6px;" data-testid="product-name">{p['name']}</h4>
-                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">SKU: <code data-testid="product-sku">{p['sku']}</code></p>
+                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">SKU: <code data-testid="product-sku">{p['sku']}</code> | Warehouse Qty: <strong style="color:#f8fafc;" data-testid="stock-count">{p['stock_quantity']}</strong></p>
             </div>
             <div>
                 <div style="font-size:18px; font-weight:700; color:#38bdf8; margin-bottom:12px;" data-testid="product-price">${p['price']:.2f}</div>
-                <a href="/checkout?sku={p['sku']}" class="btn" style="width:100%; justify-content:center; text-decoration:none;" data-testid="btn-buy-now" {disabled_attr}>
-                    Buy Now →
-                </a>
+                {button_html}
             </div>
         </div>
         """
@@ -701,10 +704,12 @@ def orders_view(success: str | None = None, session_token: str | None = Cookie(N
 # WAREHOUSE INVENTORY MANAGEMENT VIEW (Cross-Module Dependency)
 # ---------------------------------------------------------------------------
 @app.get("/inventory", response_class=HTMLResponse)
-def inventory_view(session_token: str | None = Cookie(None)):
+def inventory_view(success: str | None = None, session_token: str | None = Cookie(None)):
     session = get_session(session_token)
     if not session:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    succ = f'<div id="alert-success" data-testid="alert-success" class="alert alert-success">{success}</div>' if success else ""
 
     conn = get_db()
     products = conn.execute("SELECT * FROM products ORDER BY sku ASC").fetchall()
@@ -716,34 +721,42 @@ def inventory_view(session_token: str | None = Cookie(None)):
     """).fetchall()
     conn.close()
 
-    product_options = "".join(f'<option value="{p["sku"]}">{p["sku"]} - {p["name"]}</option>' for p in products)
+    product_options = "".join(f'<option value="{p["sku"]}">{p["sku"]} - {p["name"]} (Current: {p["stock_quantity"]})</option>' for p in products)
 
     batch_rows = ""
     for b in batches:
         batch_rows += f"""
         <tr data-testid="batch-row" data-batch="{b['batch_number']}">
-            <td><code>{b['batch_number']}</code></td>
+            <td><code data-testid="batch-code">{b['batch_number']}</code></td>
             <td>{b['sku']} - {b['product_name']}</td>
-            <td><strong>+{b['received_quantity']}</strong></td>
+            <td><strong style="color:#34d399;" data-testid="batch-added-qty">+{b['received_quantity']}</strong></td>
             <td>{b['available_quantity']}</td>
             <td>{b['created_at']}</td>
         </tr>
         """
 
     content = f"""
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div>
+            <h2>Warehouse Inventory Hub</h2>
+            <p style="color:#94a3b8; font-size:13px;">Manage physical stock batches, intake replenishment, and view live inventory audits</p>
+        </div>
+        <a href="/catalog" class="btn btn-secondary">← View Storefront Catalog</a>
+    </div>
+    {succ}
     <div style="display:grid; grid-template-columns: 1fr 2fr; gap:24px;">
         <div class="card">
             <h3 style="font-size:16px; margin-bottom:16px;">Receive Inventory Batch</h3>
             <form action="/inventory/receive" method="post">
-                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Select SKU</label>
+                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Select SKU to Replenish</label>
                 <select name="sku" data-testid="select-batch-sku" class="form-control" required>
                     {product_options}
                 </select>
 
-                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Batch Number</label>
+                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Shipment Batch Number</label>
                 <input type="text" name="batch_number" placeholder="BATCH-2026-X" data-testid="input-batch-number" class="form-control" required />
 
-                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Received Quantity</label>
+                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Received Quantity (Units)</label>
                 <input type="number" name="quantity" min="1" max="1000" value="50" data-testid="input-batch-qty" class="form-control" required />
 
                 <button type="submit" data-testid="btn-receive-batch" class="btn" style="width:100%; justify-content:center;">Intake Batch to Stock</button>
@@ -774,8 +787,11 @@ def inventory_view(session_token: str | None = Cookie(None)):
 
 @app.post("/inventory/receive")
 def receive_inventory_route(sku: str = Form(...), batch_number: str = Form(...), quantity: int = Form(...)):
-    add_inventory_batch(sku, batch_number, quantity)
-    return RedirectResponse(url="/inventory", status_code=status.HTTP_303_SEE_OTHER)
+    res = add_inventory_batch(sku, batch_number, quantity)
+    return RedirectResponse(
+        url=f"/inventory?success=Successfully+intaked+{quantity}+units+for+{sku}!+Total+stock+now:+{res['new_total_stock']}",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
 
 
 # ---------------------------------------------------------------------------

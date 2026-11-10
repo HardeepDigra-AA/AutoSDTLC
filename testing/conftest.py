@@ -21,6 +21,7 @@ from testing.framework.pages.auth_page import AuthPage
 from testing.framework.pages.catalog_page import CatalogPage
 from testing.framework.pages.checkout_page import CheckoutPage
 from testing.framework.pages.dashboard_page import OrdersDashboardPage
+from testing.framework.pages.warehouse_page import WarehousePage
 from testing.test_data.factories.data_factory import DatabaseTestSeeder
 
 
@@ -100,3 +101,8 @@ def checkout_page(page: Page, env_config: EnvironmentConfig) -> CheckoutPage:
 @pytest.fixture(scope="function")
 def dashboard_page(page: Page, env_config: EnvironmentConfig) -> OrdersDashboardPage:
     return OrdersDashboardPage(page, env_config.base_url)
+
+
+@pytest.fixture(scope="function")
+def warehouse_page(page: Page, env_config: EnvironmentConfig) -> WarehousePage:
+    return WarehousePage(page, env_config.base_url)
