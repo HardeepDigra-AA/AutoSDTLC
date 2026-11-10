@@ -40,16 +40,19 @@ init_db()
 def render_page(title: str, content: str, session: dict | None = None) -> str:
     user_nav = ""
     if session:
+        role_label = session['role'].capitalize()
         user_nav = f"""
-            <div style="display:flex; align-items:center; gap:16px;">
-                <span style="font-size:13px; color:#94a3b8;">
-                    Logged in as: <strong style="color:#f8fafc;" data-testid="nav-username">{session['username']}</strong>
-                    <span style="background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:12px; font-size:11px;" data-testid="nav-role">{session['role']}</span>
-                </span>
-                <a href="/catalog" data-testid="nav-catalog" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Catalog</a>
-                <a href="/orders" data-testid="nav-orders" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Orders</a>
-                <a href="/inventory" data-testid="nav-inventory" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Warehouse</a>
-                <form action="/logout" method="post" style="display:inline;">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); padding:4px 12px; border-radius:20px; border:1px solid #1e293b;">
+                    <span style="font-size:13px; color:#cbd5e1; font-weight:600;" data-testid="nav-username">👤 {session['username']}</span>
+                    <span style="background:rgba(59,130,246,0.15); color:#93c5fd; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:500;" data-testid="nav-role">{role_label}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <a href="/catalog" data-testid="nav-catalog" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Catalog</a>
+                    <a href="/orders" data-testid="nav-orders" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Orders</a>
+                    <a href="/inventory" data-testid="nav-inventory" style="color:#cbd5e1; text-decoration:none; font-size:13px;">Warehouse</a>
+                </div>
+                <form action="/logout" method="post" style="display:inline; margin:0;">
                     <button id="btn-logout" data-testid="btn-logout" type="submit" style="background:#334155; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px;">Sign Out</button>
                 </form>
             </div>
@@ -414,15 +417,14 @@ def catalog_view(
     cards_html = ""
     for p in products:
         stock_badge = (
-            f'<span class="badge badge-stock" data-testid="stock-badge">In Stock ({p["stock_quantity"]})</span>'
+            f'<span class="badge badge-stock" data-testid="stock-badge">In Stock (<span data-testid="stock-count">{p["stock_quantity"]}</span>)</span>'
             if p["stock_quantity"] > 5
             else (
-                f'<span class="badge badge-lowstock" data-testid="stock-badge">Low Stock ({p["stock_quantity"]})</span>'
+                f'<span class="badge badge-lowstock" data-testid="stock-badge">Low Stock (<span data-testid="stock-count">{p["stock_quantity"]}</span>)</span>'
                 if p["stock_quantity"] > 0
-                else '<span class="badge badge-outstock" data-testid="stock-badge">Out of Stock (0)</span>'
+                else '<span class="badge badge-outstock" data-testid="stock-badge">Out of Stock (<span data-testid="stock-count">0</span>)</span>'
             )
         )
-        "disabled" if p["stock_quantity"] <= 0 else ""
         button_html = (
             f'<a href="/checkout?sku={p["sku"]}" class="btn" style="width:100%; justify-content:center; text-decoration:none;" data-testid="btn-buy-now">Buy Now →</a>'
             if p["stock_quantity"] > 0
@@ -436,7 +438,7 @@ def catalog_view(
                     {stock_badge}
                 </div>
                 <h4 style="font-size:16px; margin-bottom:6px;" data-testid="product-name">{p['name']}</h4>
-                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">SKU: <code data-testid="product-sku">{p['sku']}</code> | Warehouse Qty: <strong style="color:#f8fafc;" data-testid="stock-count">{p['stock_quantity']}</strong></p>
+                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">SKU: <code data-testid="product-sku">{p['sku']}</code></p>
             </div>
             <div>
                 <div style="font-size:18px; font-weight:700; color:#38bdf8; margin-bottom:12px;" data-testid="product-price">${p['price']:.2f}</div>
