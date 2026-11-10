@@ -3,34 +3,33 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai-sdlc-orchestrator"
-version = "0.5.0"
-description = "A governed, plug-and-play multi-agent SDLC and software testing orchestration framework."
+name = "orderhub-enterprise-platform"
+version = "2.0.0"
+description = "Enterprise E-Commerce Platform with Page Object Model Playwright Test Automation Framework."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Proprietary - replace with your chosen license before external distribution" }
-authors = [{ name = "Project Team" }]
-dependencies = []
-
-[project.optional-dependencies]
-dev = ["pytest>=8.0", "ruff>=0.6"]
-web = ["fastapi>=0.115", "uvicorn>=0.30", "streamlit>=1.40"]
-qa = ["httpx>=0.27", "playwright>=1.48", "pytest-playwright>=0.6"]
-rag = ["deepeval>=2.0", "ragas>=0.2"]
-
-[project.scripts]
-ai-sdlc = "ai_sdlc.cli:main"
+authors = [{ name = "QA & DevOps Engineering Team" }]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "playwright>=1.48",
+    "pytest>=8.0",
+    "pytest-playwright>=0.6"
+]
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+include = ["apps*", "testing*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["testing/tests_e2e"]
+pythonpath = ["."]
 addopts = "-ra"
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP"]
+select = ["F", "I", "B", "UP"]
+ignore = ["E501"]
