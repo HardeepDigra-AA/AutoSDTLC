@@ -77,14 +77,14 @@ class DatabaseTestSeeder:
 
         # 2. Product Catalog (Across categories for testing filters & pagination)
         catalog = [
-            ("SKU-MACBOOK-16", "VEND-APPLE", "MacBook Pro 16 M3 Max", "Laptops", 3499.00, 2800.00, 15, "premium,laptops"),
-            ("SKU-MACBOOK-14", "VEND-APPLE", "MacBook Pro 14 M3 Pro", "Laptops", 1999.00, 1600.00, 20, "popular,laptops"),
-            ("SKU-LOGI-MX3S", "VEND-LOGI", "Logitech MX Master 3S Wireless", "Accessories", 99.99, 60.00, 45, "wireless,mouse"),
-            ("SKU-LOGI-KEYB", "VEND-LOGI", "Logitech MX Mechanical Mini", "Accessories", 149.99, 90.00, 30, "keyboard,wireless"),
-            ("SKU-DELL-U32", "VEND-DELL", "Dell UltraSharp 32-inch 4K USB-C Hub", "Displays", 849.00, 650.00, 12, "displays,4k"),
-            ("SKU-DELL-U27", "VEND-DELL", "Dell UltraSharp 27-inch 4K IPS", "Displays", 579.00, 420.00, 25, "displays,office"),
-            ("SKU-CABLE-TH4", "VEND-APPLE", "Thunderbolt 4 Pro Cable (1.8m)", "Cables", 129.00, 60.00, 50, "cables,apple"),
-            ("SKU-RARE-TEST", "VEND-LOGI", "Vintage Prototype Trackball Controller", "Vintage", 499.00, 250.00, 2, "rare,lowstock"),
+            ("SKU-MACBOOK-16", "VEND-APPLE", "MacBook Pro 16\"", "Laptops", 3499.00, 2800.00, 15, "premium,laptops"),
+            ("SKU-MACBOOK-14", "VEND-APPLE", "MacBook Pro 14\"", "Laptops", 1999.00, 1600.00, 20, "popular,laptops"),
+            ("SKU-LOGI-MX3S", "VEND-LOGI", "MX Master 3S", "Accessories", 99.99, 60.00, 45, "wireless,mouse"),
+            ("SKU-LOGI-KEYB", "VEND-LOGI", "MX Mechanical Mini", "Accessories", 149.99, 90.00, 30, "keyboard,wireless"),
+            ("SKU-DELL-U32", "VEND-DELL", "UltraSharp 32\" 4K", "Displays", 849.00, 650.00, 12, "displays,4k"),
+            ("SKU-DELL-U27", "VEND-DELL", "UltraSharp 27\" 4K", "Displays", 579.00, 420.00, 25, "displays,office"),
+            ("SKU-CABLE-TH4", "VEND-APPLE", "Thunderbolt 4 Pro", "Cables", 129.00, 60.00, 50, "cables,apple"),
+            ("SKU-RARE-TEST", "VEND-LOGI", "Vintage Trackball", "Vintage", 499.00, 250.00, 2, "rare,lowstock"),
         ]
 
         for p in catalog:

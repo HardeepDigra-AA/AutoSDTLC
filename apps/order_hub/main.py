@@ -140,103 +140,183 @@ def render_page(title: str, content: str, session: dict | None = None) -> str:
     </script>
     <style>
         :root {{
-            --bg: #0b0f19;
-            --surface: #131b2e;
-            --surface-hover: #1c263d;
-            --border: #1e293b;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --bg: #090d16;
+            --surface: rgba(18, 24, 38, 0.75);
+            --surface-hover: rgba(28, 38, 60, 0.9);
+            --surface-card: #0e1526;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
             --text: #f8fafc;
             --text-muted: #94a3b8;
-            --danger: #ef4444;
+            --text-sub: #64748b;
+            --danger: #f43f5e;
             --success: #10b981;
             --warning: #f59e0b;
         }}
         * {{ box-sizing: border-box; margin: 0; padding: 0; }}
         body {{
-            background: var(--bg);
+            background: radial-gradient(circle at 50% 0%, #151f38 0%, #090d16 65%);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }}
         nav {{
-            background: var(--surface);
+            background: rgba(9, 13, 22, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 14px 32px;
+            padding: 16px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }}
-        .brand {{ font-size: 18px; font-weight: 800; color: #f8fafc; text-decoration: none; }}
-        .brand span {{ color: #3b82f6; }}
-        .container {{ max-width: 1200px; margin: 32px auto; padding: 0 20px; }}
+        .brand {{
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #f8fafc;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .brand span {{
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }}
+        .container {{ max-width: 1220px; margin: 40px auto; padding: 0 24px; }}
         .card {{
-            background: var(--surface);
+            background: var(--surface-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 16px;
+            padding: 26px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }}
+        .card-product {{
+            background: linear-gradient(180deg, rgba(22, 31, 51, 0.7) 0%, rgba(14, 21, 38, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             padding: 24px;
-            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }}
+        .card-product:hover {{
+            transform: translateY(-4px);
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 24px rgba(59, 130, 246, 0.12);
+        }}
+        .product-hero-badge {{
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }}
         .form-control {{
             width: 100%;
-            padding: 10px 14px;
-            background: #0b0f19;
+            padding: 11px 16px;
+            background: rgba(14, 21, 38, 0.8);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            color: white;
+            border-radius: 10px;
+            color: #f8fafc;
             font-size: 14px;
             margin-bottom: 14px;
             outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }}
-        .form-control:focus {{ border-color: var(--primary); }}
+        .form-control:focus {{
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }}
         .btn {{
-            background: var(--primary);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            letter-spacing: -0.1px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            transition: all 0.18s ease;
         }}
-        .btn:hover {{ background: var(--primary-hover); }}
-        .btn-secondary {{ background: #334155; }}
-        .btn-secondary:hover {{ background: #475569; }}
-        .btn-danger {{ background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }}
-        .btn-danger:hover {{ background: rgba(239, 68, 68, 0.3); }}
-        .table {{ width: 100%; border-collapse: collapse; margin-top: 16px; }}
-        .table th, .table td {{ padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }}
-        .table th {{ color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }}
-        .badge {{ padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }}
-        .badge-confirmed {{ background: rgba(59,130,246,0.15); color: #60a5fa; }}
-        .badge-delivered {{ background: rgba(16,185,129,0.15); color: #34d399; }}
-        .badge-cancelled {{ background: rgba(239,68,68,0.15); color: #f87171; }}
-        .badge-stock {{ background: rgba(16,185,129,0.1); color: #34d399; }}
-        .badge-lowstock {{ background: rgba(245,158,11,0.15); color: #fbbf24; }}
-        .badge-outstock {{ background: rgba(239,68,68,0.15); color: #f87171; }}
-        .alert {{ padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }}
-        .alert-danger {{ background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }}
-        .alert-success {{ background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }}
-        .pagination {{ display: flex; gap: 8px; margin-top: 20px; justify-content: center; }}
-        .page-link {{
-            padding: 6px 12px;
-            background: var(--surface);
+        .btn:hover {{
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+        }}
+        .btn-secondary {{
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
+            color: #e2e8f0;
+            box-shadow: none;
+        }}
+        .btn-secondary:hover {{
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: none;
+        }}
+        .btn-danger {{
+            background: rgba(244, 63, 94, 0.15);
+            color: #fda4af;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            box-shadow: none;
+        }}
+        .btn-danger:hover {{ background: rgba(244, 63, 94, 0.25); }}
+        .table {{ width: 100%; border-collapse: collapse; margin-top: 18px; }}
+        .table th, .table td {{ padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }}
+        .table th {{ color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }}
+        .badge {{ padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.2px; display: inline-flex; align-items: center; gap: 5px; }}
+        .badge-confirmed {{ background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }}
+        .badge-delivered {{ background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }}
+        .badge-cancelled {{ background: rgba(244,63,94,0.15); color: #fda4af; border: 1px solid rgba(244,63,94,0.25); }}
+        .badge-stock {{ background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }}
+        .badge-lowstock {{ background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }}
+        .badge-outstock {{ background: rgba(244,63,94,0.12); color: #fda4af; border: 1px solid rgba(244,63,94,0.25); }}
+        .alert {{ padding: 14px 18px; border-radius: 12px; font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }}
+        .alert-danger {{ background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.25); color: #fda4af; }}
+        .alert-success {{ background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }}
+        .pagination {{ display: flex; gap: 8px; margin-top: 32px; justify-content: center; }}
+        .page-link {{
+            padding: 8px 16px;
+            background: rgba(18, 24, 38, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
         }}
-        .page-link.active {{ background: var(--primary); border-color: var(--primary); }}
+        .page-link:hover {{ color: #ffffff; border-color: var(--border-hover); }}
+        .page-link.active {{ background: #2563eb; color: #ffffff; border-color: #3b82f6; }}
         /* Async Loading Spinner Modal */
         #loading-overlay {{
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -245,12 +325,12 @@ def render_page(title: str, content: str, session: dict | None = None) -> str:
             font-size: 14px;
         }}
         .spinner {{
-            width: 40px; height: 40px;
-            border: 4px solid #334155;
-            border-top: 4px solid #3b82f6;
+            width: 44px; height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #60a5fa;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin-bottom: 16px;
         }}
         @keyframes spin {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
     </style>
@@ -426,22 +506,22 @@ def catalog_view(
             )
         )
         button_html = (
-            f'<a href="/checkout?sku={p["sku"]}" class="btn" style="width:100%; justify-content:center; text-decoration:none;" data-testid="btn-buy-now">Buy Now →</a>'
+            f'<a href="/checkout?sku={p["sku"]}" class="btn" style="width:100%;" data-testid="btn-buy-now">Buy Now →</a>'
             if p["stock_quantity"] > 0
-            else '<button class="btn btn-secondary" style="width:100%; justify-content:center; opacity:0.5; cursor:not-allowed;" data-testid="btn-buy-now" disabled>Out of Stock</button>'
+            else '<button class="btn btn-secondary" style="width:100%; opacity:0.4; cursor:not-allowed;" data-testid="btn-buy-now" disabled>Out of Stock</button>'
         )
         cards_html += f"""
-        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;" data-testid="product-card" data-sku="{p['sku']}">
+        <div class="card-product" data-testid="product-card" data-sku="{p['sku']}">
             <div>
-                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
-                    <span style="font-size:11px; color:#60a5fa; font-weight:700;" data-testid="product-category">{p['category']}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#60a5fa; font-weight:700;" data-testid="product-category">{p['category']}</span>
                     {stock_badge}
                 </div>
-                <h4 style="font-size:16px; margin-bottom:6px;" data-testid="product-name">{p['name']}</h4>
-                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">SKU: <code data-testid="product-sku">{p['sku']}</code></p>
+                <h4 style="font-size:20px; font-weight:700; letter-spacing:-0.4px; margin-bottom:6px; color:#ffffff;" data-testid="product-name">{p['name']}</h4>
+                <p style="font-size:12px; color:#64748b; margin-bottom:18px;">SKU: <code style="color:#94a3b8; font-family:ui-monospace, monospace;" data-testid="product-sku">{p['sku']}</code></p>
             </div>
-            <div>
-                <div style="font-size:18px; font-weight:700; color:#38bdf8; margin-bottom:12px;" data-testid="product-price">${p['price']:.2f}</div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top:16px; margin-top:12px;">
+                <div style="font-size:22px; font-weight:800; letter-spacing:-0.5px; color:#38bdf8; margin-bottom:14px;" data-testid="product-price">${p['price']:.2f}</div>
                 {button_html}
             </div>
         </div>
@@ -455,13 +535,13 @@ def catalog_view(
         pagination_html += f'<a href="/catalog?page={p_num}&category={category or ""}&q={q or ""}" class="page-link {active_cls}" data-testid="pagination-page-{p_num}">{p_num}</a>'
 
     content = f"""
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 24px;">
         <div>
-            <h2 style="font-size:24px; margin-bottom:4px;">Enterprise Product Catalog</h2>
-            <p style="color:#94a3b8; font-size:13px;">Browse active products with dynamic inventory sync</p>
+            <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#60a5fa;">Storefront</span>
+            <h2 style="font-size:32px; font-weight:800; letter-spacing:-0.8px; margin-top:4px;">Products</h2>
         </div>
-        <form action="/catalog" method="get" style="display:flex; gap:12px;">
-            <input type="text" name="q" placeholder="Search SKU or name..." value="{q or ''}" data-testid="search-input" class="form-control" style="margin-bottom:0; width:220px;" />
+        <form action="/catalog" method="get" style="display:flex; gap:12px; align-items:center;">
+            <input type="text" name="q" placeholder="Search products or SKU..." value="{q or ''}" data-testid="search-input" class="form-control" style="margin-bottom:0; width:220px;" />
             <select name="category" data-testid="category-filter" class="form-control" style="margin-bottom:0; width:160px;">
                 <option value="ALL">All Categories</option>
                 {"".join(f'<option value="{c}" {"selected" if category == c else ""}>{c}</option>' for c in categories)}
@@ -470,8 +550,8 @@ def catalog_view(
         </form>
     </div>
 
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:20px;" id="products-grid" data-testid="products-grid">
-        {cards_html or '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#64748b;">No products matched the filter criteria.</div>'}
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:24px;" id="products-grid" data-testid="products-grid">
+        {cards_html or '<div style="grid-column: 1/-1; text-align:center; padding:60px; color:#64748b;">No products matched the filter criteria.</div>'}
     </div>
 
     <div class="pagination" data-testid="pagination-container">
